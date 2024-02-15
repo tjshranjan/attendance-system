@@ -11,6 +11,7 @@ import (
 	"rajeevranjan/attendance-system/services"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	// "github.com/yourusername/yourprojectname/db" // Import your db package
 )
 
@@ -44,7 +45,14 @@ func main() {
 
 	routers := routers.NewRouterImpl(principalRouter, teacherRouter, studentRouter, mainRouter)
 	routers.Init()
-	// Start the HTTP server
+
+	// Create a new CORS handler with default options
+	c := cors.Default()
+
+	// Wrap your main router with the CORS handler
+	handler := c.Handler(mainRouter)
+
+	// Start the HTTP server with the CORS-wrapped router
 	fmt.Println("Server listening on port 8080")
-	http.ListenAndServe(":8080", mainRouter)
+	http.ListenAndServe(":8080", handler)
 }

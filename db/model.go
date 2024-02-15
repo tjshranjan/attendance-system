@@ -46,7 +46,7 @@ type TAttendances struct {
 	TeacherID  int       `pg:"teacher_id,fk:teachers" json:"teacherId"`
 	Status     bool      `pg:"status" json:"status"`
 	RecordedAt time.Time `pg:"recorded_at" json:"recordedAt"`
-	Teacher    Teachers  `pg:"rel:has-one"`
+	Teacher    Teachers  `pg:"rel:has-one" json:"-"`
 }
 
 // PunchTable

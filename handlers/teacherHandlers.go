@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"rajeevranjan/attendance-system/services"
 	"strconv"
@@ -24,6 +25,8 @@ func (th *TeacherHandler) PunchInHandler(w http.ResponseWriter, r *http.Request)
 	// Set content type header to application/json
 	w.Header().Set("Content-Type", "application/json")
 
+	fmt.Println("Just entered in the handler")
+
 	// Handle CORS preflight request
 	if r.Method == http.MethodOptions {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -39,18 +42,21 @@ func (th *TeacherHandler) PunchInHandler(w http.ResponseWriter, r *http.Request)
 	}
 	// Decode the request body into a struct
 	var requestBody struct {
-		UserID int `json:"userId"`
+		UserID string `json:"userId"`
 	}
+	fmt.Println(json.NewDecoder(r.Body))
 	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 	// Extract the UserID from the decoded request body
 	userID := requestBody.UserID
-
+	fmt.Println(userID)
 	// Perform your processing with the userID here
 	// For example:
-	err := th.Service.PunchInService(userID)
+	userId, c := strconv.Atoi(userID)
+	fmt.Println(userId, c)
+	err := th.Service.PunchInService(userId)
 	if err != nil {
 		http.Error(w, "Failed to punch in", http.StatusInternalServerError)
 		return
@@ -78,7 +84,7 @@ func (th *TeacherHandler) PunchOutHandler(w http.ResponseWriter, r *http.Request
 	}
 	// Decode the request body into a struct
 	var requestBody struct {
-		UserID int `json:"userId"`
+		UserID string `json:"userId"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -89,7 +95,8 @@ func (th *TeacherHandler) PunchOutHandler(w http.ResponseWriter, r *http.Request
 
 	// Perform your processing with the userID here
 	// For example:
-	err := th.Service.PunchOutService(userID)
+	userId, _ := strconv.Atoi(userID)
+	err := th.Service.PunchOutService(userId)
 	if err != nil {
 		http.Error(w, "Failed to punch out", http.StatusInternalServerError)
 		return
@@ -102,14 +109,14 @@ func (th *TeacherHandler) GetTeacherAttendanceHandler(w http.ResponseWriter, r *
 	// Set content type header to application/json
 	w.Header().Set("Content-Type", "application/json")
 
-	// Handle CORS preflight request
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	// // Handle CORS preflight request
+	// if r.Method == http.MethodOptions {
+	// 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	// 	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	// 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	// 	w.WriteHeader(http.StatusOK)
+	// 	return
+	// }
 	// Check if the request method is POST
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -154,14 +161,12 @@ func (th *TeacherHandler) GetTeacherAttendanceHandler(w http.ResponseWriter, r *
 
 }
 
-func (th *TeacherHandler)GetClassAttendanceHandler(w http.ResponseWriter, r *http.Request){
+func (th *TeacherHandler) GetClassAttendanceHandler(w http.ResponseWriter, r *http.Request) {
 	// Set content type header to application/json
 	w.Header().Set("Content-Type", "application/json")
 
 	// Handle CORS preflight request
 	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.WriteHeader(http.StatusOK)
 		return
@@ -175,14 +180,13 @@ func (th *TeacherHandler)GetClassAttendanceHandler(w http.ResponseWriter, r *htt
 	//parsing the URL Parameters
 	vars := mux.Vars(r)
 
-
-	class, err:=strconv.Atoi(vars["class"])
-	if err!=nil ||class>10 ||class<1{
-		http.Error(w,"Invalid class",http.StatusBadRequest)
-		return 
+	class, err := strconv.Atoi(vars["class"])
+	if err != nil || class > 10 || class < 1 {
+		http.Error(w, "Invalid class", http.StatusBadRequest)
+		return
 	}
 	day, err := strconv.Atoi(vars["day"])
-	if err != nil ||day>31 ||day<1 {
+	if err != nil || day > 31 || day < 1 {
 		http.Error(w, "Invalid Day", http.StatusBadRequest)
 		return
 	}

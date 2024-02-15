@@ -2,7 +2,10 @@ module rajeevranjan/attendance-system
 
 go 1.21.6
 
-require github.com/go-pg/pg v8.0.7+incompatible
+require (
+	github.com/go-pg/pg v8.0.7+incompatible
+	github.com/rs/cors v1.10.1
+)
 
 require (
 	github.com/go-pg/zerochecker v0.2.0 // indirect
